@@ -1,0 +1,53 @@
+{
+  "name": "davidmaack/metamodelsattribute_encryptedtext",
+  "description": "MetaModels attribute with encrypted text",
+  "keywords": [
+    "contao",
+    "metamodels",
+    "attribute",
+    "text",
+    "nontranslatable"
+  ],
+  "type": "contao-module",
+  "license": "LGPL-3.0+",
+  "authors": [
+    {
+      "name": "David Maack",
+      "email": "david.maack@arcor.de",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "email": "david.maack@arcor.de",
+    "issues": "https://github.com/davidmaack/metamodelsattribute_encryptedtext/issues",
+    "irc": "irc://irc.freenode.org/contao.mm",
+    "source": "https://github.com/davidmaack/metamodelsattribute_encryptedtext"
+  },
+  "require": {
+    "php": ">=5.3",
+    "contao/core": ">=3.2,<3.6",
+    "contao-community-alliance/composer-plugin": "~2.0",
+    "metamodels/core": "~2.0",
+    "metamodels/attribute_text": "~2.0"
+  },
+  "conflict": {
+    "contao/core": "3.4.0"
+  },
+  "autoload": {
+    "psr-0": {
+      "MetaModels": "src"
+    }
+  },
+  "extra": {
+    "contao": {
+      "symlinks": {
+        "contao": "system/modules/metamodelsattribute_encryptedtext"
+      }
+    },
+    "branch-alias": {
+      "dev-master": "2.0.x-dev"
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
