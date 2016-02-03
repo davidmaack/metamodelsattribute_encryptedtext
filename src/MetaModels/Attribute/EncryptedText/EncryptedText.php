@@ -79,4 +79,24 @@ class EncryptedText extends Text implements IComplex
                 ->prepare(sprintf('DELETE FROM %s WHERE id IN (' . $this->parameterMask($arrIds) . ')' , $strTable))
                 ->execute($arrIds);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function searchFor($strPattern)
+    {
+        // Base implementation, do a simple search on given column.
+        $objQuery = $this->getMetaModel()->getServiceContainer()->getDatabase()
+            ->prepare(
+                sprintf(
+                    'SELECT id FROM %s WHERE %s LIKE ?',
+                    $this->getMetaModel()->getTableName(),
+                    $this->getColName()
+                )
+            )
+            ->execute(str_replace(array('*', '?'), array('%', '_'), $strPattern));
+
+        $arrIds = $objQuery->fetchEach('id');
+        return $arrIds;
+    }
 }
