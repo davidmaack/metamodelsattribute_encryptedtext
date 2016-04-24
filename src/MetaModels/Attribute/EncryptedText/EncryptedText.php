@@ -89,14 +89,53 @@ class EncryptedText extends Text implements IComplex
         $objQuery = $this->getMetaModel()->getServiceContainer()->getDatabase()
             ->prepare(
                 sprintf(
-                    'SELECT id FROM %s WHERE %s LIKE ?',
+                    'SELECT id FROM %s WHERE %s = ?',
                     $this->getMetaModel()->getTableName(),
                     $this->getColName()
                 )
             )
-            ->execute(str_replace(array('*', '?'), array('%', '_'), $strPattern));
+            ->execute(\Encryption::encrypt($strPattern));
 
         $arrIds = $objQuery->fetchEach('id');
         return $arrIds;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getFilterOptions($idList, $usedOnly, &$arrCount = null)
+    {
+        $strCol = $this->getColName();
+        if ($idList) {
+            $objRow = $this->getMetaModel()->getServiceContainer()->getDatabase()
+                ->prepare(
+                    'SELECT ' . $strCol . ', COUNT(' . $strCol . ') as mm_count
+                    FROM ' . $this->getMetaModel()->getTableName() .
+                    ' WHERE id IN (' . $this->parameterMask($idList) . ')
+                    GROUP BY ' . $strCol . '
+                    ORDER BY FIELD(id,' . $this->parameterMask($idList). ')'
+                )
+                ->execute(array_merge($idList, $idList));
+        } elseif ($usedOnly) {
+            $objRow = $this->getMetaModel()->getServiceContainer()->getDatabase()->execute(
+                'SELECT ' . $strCol . ', COUNT(' . $strCol . ') as mm_count
+                FROM ' . $this->getMetaModel()->getTableName() . '
+                GROUP BY ' . $strCol
+            );
+        } else {
+            // We can not do anything here, must be handled by the derived attribute class.
+            return array();
+        }
+
+        $arrResult = array();
+        while ($objRow->next()) {
+            if (is_array($arrCount)) {
+                $arrCount[\Encryption::decrypt($objRow->$strCol)] = $objRow->mm_count;
+            }
+
+            $arrResult[\Encryption::decrypt($objRow->$strCol)] = \Encryption::decrypt($objRow->$strCol);
+        }
+
+        return $arrResult;
     }
 }
